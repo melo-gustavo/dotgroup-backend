@@ -8,6 +8,39 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User, UserType } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { parseDateField } from '../common/common';
+
+const validationUser: (user: CreateUserDto | UpdateUserDto) => {
+  createdAt: any;
+  updatedAt: any;
+} = (user: CreateUserDto | UpdateUserDto) => {
+  if (!user.name?.trim()) {
+    throw new BadRequestException('O campo "name" é obrigatório');
+  }
+
+  if (!user.email?.trim()) {
+    throw new BadRequestException('O campo "email" é obrigatório');
+  }
+
+  if (!user.type) {
+    throw new BadRequestException('O campo "type" é obrigatório');
+  }
+
+  if (!Object.values(UserType).includes(user.type)) {
+    throw new BadRequestException('O campo "type" é inválido');
+  }
+
+  const createdAt =
+    user.createdAt !== undefined && user.createdAt !== null
+      ? parseDateField(user.createdAt, 'createdAt')
+      : undefined;
+  const updatedAt =
+    user.updatedAt !== undefined && user.updatedAt !== null
+      ? parseDateField(user.updatedAt, 'updatedAt')
+      : undefined;
+
+  return { createdAt, updatedAt };
+};
 
 @Injectable()
 export class UsersService {
@@ -16,43 +49,8 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  private parseDateField(
-    value: Date | string,
-    field: 'createdAt' | 'updatedAt',
-  ) {
-    const parsed = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-      throw new BadRequestException(`O campo "${field}" é inválido`);
-    }
-    return parsed;
-  }
-
   async create(createUserDto: CreateUserDto) {
-    if (!createUserDto.name?.trim()) {
-      throw new BadRequestException('O campo "name" é obrigatório');
-    }
-
-    if (!createUserDto.email?.trim()) {
-      throw new BadRequestException('O campo "email" é obrigatório');
-    }
-
-    if (!createUserDto.type) {
-      throw new BadRequestException('O campo "type" é obrigatório');
-    }
-
-    if (!Object.values(UserType).includes(createUserDto.type)) {
-      throw new BadRequestException('O campo "type" é inválido');
-    }
-
-    const createdAt =
-      createUserDto.createdAt !== undefined && createUserDto.createdAt !== null
-        ? this.parseDateField(createUserDto.createdAt, 'createdAt')
-        : undefined;
-    const updatedAt =
-      createUserDto.updatedAt !== undefined && createUserDto.updatedAt !== null
-        ? this.parseDateField(createUserDto.updatedAt, 'updatedAt')
-        : undefined;
-
+    const { createdAt, updatedAt } = validationUser(createUserDto);
     const user = this.userRepository.create({
       ...createUserDto,
       ...(createdAt ? { createdAt } : {}),
@@ -61,8 +59,8 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    return await this.userRepository.find();
   }
 
   async findOne(id: number) {
@@ -76,32 +74,14 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    if (!updateUserDto.name?.trim()) {
-      throw new BadRequestException('O campo "name" não pode ser vazio');
-    }
-
-    if (!updateUserDto.email?.trim()) {
-      throw new BadRequestException('O campo "email" não pode ser vazio');
-    }
-
-    if (!updateUserDto.type) {
-      throw new BadRequestException('O campo "type" não pode ser vazio');
-    }
-
-    if (!Object.values(UserType).includes(updateUserDto.type)) {
-      throw new BadRequestException('O campo "type" é inválido');
-    }
-
-    const createdAt =
-      updateUserDto.createdAt !== undefined && updateUserDto.createdAt !== null
-        ? this.parseDateField(updateUserDto.createdAt, 'createdAt')
-        : undefined;
-    const updatedAt =
-      updateUserDto.updatedAt !== undefined && updateUserDto.updatedAt !== null
-        ? this.parseDateField(updateUserDto.updatedAt, 'updatedAt')
-        : undefined;
+    const { createdAt, updatedAt } = validationUser(updateUserDto);
 
     const user = await this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${id} não encontrado`);
+    }
+
     const updatedUser = this.userRepository.merge(user, {
       ...updateUserDto,
       ...(createdAt ? { createdAt } : {}),
@@ -112,6 +92,11 @@ export class UsersService {
 
   async remove(id: number) {
     const user = await this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${id} não encontrado`);
+    }
+
     await this.userRepository.remove(user);
     return { deleted: true };
   }
