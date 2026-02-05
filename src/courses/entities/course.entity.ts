@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-enum CourseType {
+export enum CourseType {
   INOVATION = 'INOVATION',
   TECNOLOGY = 'TECNOLOGY',
   MARKETING = 'MARKETING',

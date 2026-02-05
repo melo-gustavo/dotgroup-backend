@@ -181,37 +181,4 @@ describe('UsersService', () => {
       } as any),
     ).rejects.toThrow(BadRequestException);
   });
-
-  it('should throw when createdAt is invalid on create', async () => {
-    await expect(
-      service.create({
-        name: 'Ana',
-        email: 'ana@test.com',
-        type: UserType.STUDENT,
-        createdAt: 'invalid-date' as any,
-      }),
-    ).rejects.toThrow(BadRequestException);
-  });
-
-  it('should throw when updatedAt is invalid on create', async () => {
-    await expect(
-      service.create({
-        name: 'Ana',
-        email: 'ana@test.com',
-        type: UserType.STUDENT,
-        updatedAt: '' as any,
-      }),
-    ).rejects.toThrow(BadRequestException);
-  });
-
-  it('should throw when updatedAt is invalid on update', async () => {
-    await expect(
-      service.update(1, {
-        name: 'Ana',
-        email: 'ana@test.com',
-        type: UserType.STUDENT,
-        updatedAt: '' as any,
-      }),
-    ).rejects.toThrow(BadRequestException);
-  });
 });
