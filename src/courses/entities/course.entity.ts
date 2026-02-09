@@ -8,7 +8,7 @@ export enum CourseType {
   AGROBUSINESS = 'AGROBUSINESS',
 }
 
-Entity();
+@Entity()
 export class Course {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,6 +21,9 @@ export class Course {
 
   @Column({ type: 'enum', enum: CourseType, nullable: false })
   type: CourseType;
+
+  @Column({ nullable: true })
+  image_url: string;
 
   @Column({ nullable: true })
   createdAt: Date;
