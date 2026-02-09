@@ -84,7 +84,6 @@ export class CoursesService {
     }
 
     const updatedCourse = this.courseRepository.merge(course, {
-      id: id,
       ...updateCourseDto,
       ...(createdAt ? { createdAt } : {}),
       ...(updatedAt ? { updatedAt } : {}),
