@@ -3,6 +3,7 @@
     <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="NestJS Logo" />
   </a>
 </p>
+
 # DotGroup Backend
 
 API da plataforma DotGroup, desenvolvida com NestJS + TypeORM + PostgreSQL + MinIO.
