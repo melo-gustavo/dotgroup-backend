@@ -83,6 +83,7 @@ describe('UsersService', () => {
         email: 'ana@test.com',
         type: UserType.TEACHER,
         updatedAt,
+        id: 1,
       }),
     ).resolves.toEqual({
       ...user,
@@ -121,6 +122,7 @@ describe('UsersService', () => {
   it('should throw when name is missing on update', async () => {
     await expect(
       service.update(1, {
+        id: 1,
         name: '',
         email: 'ana@test.com',
         type: UserType.STUDENT,
@@ -131,6 +133,7 @@ describe('UsersService', () => {
   it('should throw when email is missing on update', async () => {
     await expect(
       service.update(1, {
+        id: 1,
         name: 'Ana',
         email: '',
         type: UserType.STUDENT,
@@ -143,6 +146,7 @@ describe('UsersService', () => {
 
     await expect(
       service.update(999, {
+        id: 999,
         name: 'Ana',
         email: 'ana@test.com',
         type: UserType.STUDENT,

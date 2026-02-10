@@ -12,4 +12,5 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
   })
   @IsBoolean()
   removeImage?: boolean;
+  id: number;
 }
