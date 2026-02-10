@@ -1,4 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { Course } from '../../courses/entities/course.entity';
+import { User } from '../../users/entities/user.entity';
+import { Enrollment } from '../../enrollments/entities/enrollment.entity';
+
+export enum ClassStatus {
+  PLANEJADA = 'planejada',
+  DISPONIVEL = 'disponível',
+  ENCERRADA = 'encerrada',
+}
 
 @Entity()
 export class Class {
@@ -20,9 +36,30 @@ export class Class {
   @Column({ nullable: false })
   endDate: Date;
 
+  @Column({
+    type: 'enum',
+    enum: ClassStatus,
+    nullable: false,
+    default: ClassStatus.PLANEJADA,
+  })
+  status: ClassStatus;
+
   @Column({ nullable: true })
   createdAt: Date;
 
   @Column({ nullable: true })
   updatedAt: Date;
+
+  @ManyToOne(() => Course, (course) => course.classes, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'courseId' })
+  course: Course;
+
+  @ManyToOne(() => User, (user) => user.classesAsTeacher, {
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'teacherId' })
+  teacher: User;
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.class)
+  enrollments: Enrollment[];
 }

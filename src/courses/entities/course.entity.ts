@@ -1,8 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Class } from '../../classes/entities/class.entity';
+import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 
 export enum CourseType {
-  INOVATION = 'INOVATION',
-  TECNOLOGY = 'TECNOLOGY',
+  INNOVATION = 'INNOVATION',
+  TECHNOLOGY = 'TECHNOLOGY',
   MARKETING = 'MARKETING',
   ENTREPRENEURSHIP = 'ENTREPRENEURSHIP',
   AGROBUSINESS = 'AGROBUSINESS',
@@ -30,4 +32,10 @@ export class Course {
 
   @Column({ nullable: true })
   updatedAt: Date;
+
+  @OneToMany(() => Class, (classEntity) => classEntity.course)
+  classes: Class[];
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
+  enrollments: Enrollment[];
 }

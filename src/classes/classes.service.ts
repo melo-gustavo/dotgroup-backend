@@ -6,7 +6,8 @@ import {
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { Class } from './entities/class.entity';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { FilterClassDto } from './dto/filter-class.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { parseDateField } from '../common/common';
 import { UserType, User as UserEntity } from '../users/entities/user.entity';
@@ -100,8 +101,14 @@ export class ClassesService {
     return this.classesRepository.save(newClass);
   }
 
-  async findAll() {
-    return await this.classesRepository.find();
+  async findAll(query: FilterClassDto) {
+    const where: FindOptionsWhere<Class> = {};
+
+    if (query.teacherId) where.teacherId = query.teacherId;
+    if (query.courseId) where.courseId = query.courseId;
+    if (query.name) where.name = Like(`%${query.name}%`);
+
+    return await this.classesRepository.find({ where });
   }
 
   async findOne(id: number) {

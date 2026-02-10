@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { Like, Repository, FindOptionsWhere } from 'typeorm';
 import { User, UserType } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { parseDateField } from '../common/common';
+import { UserFilterDto } from './dto/filter-user.dto';
 
 const validationUser: (user: CreateUserDto | UpdateUserDto) => {
   createdAt: any;
@@ -59,8 +60,14 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async findAll() {
-    return await this.userRepository.find();
+  async findAll(query: UserFilterDto) {
+    const where: FindOptionsWhere<User> = {};
+
+    if (query.name) where.name = Like(`%${query.name}%`);
+    if (query.email) where.email = Like(`%${query.email}%`);
+    if (query.type) where.type = query.type;
+
+    return this.userRepository.find({ where });
   }
 
   async findOne(id: number) {
@@ -91,13 +98,10 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    const user = await this.findOne(id);
+    await this.findOne(id);
 
-    if (!user) {
-      throw new NotFoundException(`Usuário com ID ${id} não encontrado`);
-    }
+    await this.userRepository.delete(id);
 
-    await this.userRepository.remove(user);
     return { deleted: true };
   }
 }
