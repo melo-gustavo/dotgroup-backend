@@ -4,10 +4,16 @@ import { CoursesService } from './courses.service';
 import { Repository } from 'typeorm';
 import { Course, CourseType } from './entities/course.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { UploadsService } from '../uploads/uploads.service';
 
 describe('CoursesService', () => {
   let service: CoursesService;
   let repository: jest.Mocked<Repository<Course>>;
+  let uploadsService: {
+    uploadImage: jest.Mock;
+    getImageUrl: jest.Mock;
+    removeImage: jest.Mock;
+  };
 
   const repositoryMock = {
     create: jest.fn(),
@@ -18,6 +24,12 @@ describe('CoursesService', () => {
     delete: jest.fn(),
   };
 
+  const uploadsServiceMock = {
+    uploadImage: jest.fn(),
+    getImageUrl: jest.fn(),
+    removeImage: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -26,12 +38,18 @@ describe('CoursesService', () => {
           provide: getRepositoryToken(Course),
           useValue: repositoryMock,
         },
+        {
+          provide: UploadsService,
+          useValue: uploadsServiceMock,
+        },
       ],
     }).compile();
 
     service = module.get<CoursesService>(CoursesService);
     repository = module.get(getRepositoryToken(Course));
+    uploadsService = module.get(UploadsService);
     jest.clearAllMocks();
+    uploadsService.getImageUrl.mockResolvedValue({ url: 'http://signed-url' });
   });
 
   it('should be defined', () => {

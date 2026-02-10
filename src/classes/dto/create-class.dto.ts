@@ -28,7 +28,7 @@ export class CreateClassDto {
   @IsNotEmpty()
   endDate: Date;
 
-  @ApiProperty({ example: ClassStatus.DISPONIVEL })
+  @ApiProperty({ example: ClassStatus.ACTIVE })
   @IsEnum(ClassStatus)
   @IsOptional()
   status?: ClassStatus;

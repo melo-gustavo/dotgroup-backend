@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { CourseType } from '../entities/course.entity';
 
 export class CourseFilterDto {

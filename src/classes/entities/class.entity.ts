@@ -11,9 +11,9 @@ import { User } from '../../users/entities/user.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 
 export enum ClassStatus {
-  PLANEJADA = 'planejada',
-  DISPONIVEL = 'disponível',
-  ENCERRADA = 'encerrada',
+  PLANNED = 'PLANNED',
+  ACTIVE = 'ACTIVE',
+  FINISHED = 'FINISHED',
 }
 
 @Entity()
@@ -40,7 +40,7 @@ export class Class {
     type: 'enum',
     enum: ClassStatus,
     nullable: false,
-    default: ClassStatus.PLANEJADA,
+    default: ClassStatus.PLANNED,
   })
   status: ClassStatus;
 

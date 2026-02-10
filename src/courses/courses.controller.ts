@@ -8,7 +8,11 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -19,8 +23,26 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  async create(@Body() createCourseDto: CreateCourseDto) {
-    return await this.coursesService.create(createCourseDto);
+  @ApiOperation({ summary: 'Cria um novo curso com upload de imagem opcional' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', example: 'Título do Curso' },
+        description: { type: 'string', example: 'Descrição do curso' },
+        type: { type: 'string', example: 'TECHNOLOGY' },
+        image: { type: 'string', format: 'binary' },
+      },
+      required: ['title', 'description', 'type'],
+    },
+  })
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() createCourseDto: CreateCourseDto,
+    @UploadedFile() image?: any,
+  ) {
+    return await this.coursesService.create(createCourseDto, image);
   }
 
   @Get()
@@ -34,11 +56,28 @@ export class CoursesController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza um curso com upload de imagem opcional' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', example: 'Titulo do Curso' },
+        description: { type: 'string', example: 'Descricao do curso' },
+        type: { type: 'string', example: 'TECHNOLOGY' },
+        updatedAt: { type: 'string', format: 'date-time' },
+        removeImage: { type: 'boolean', example: true },
+        image: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCourseDto: UpdateCourseDto,
+    @UploadedFile() image?: any,
   ) {
-    return await this.coursesService.update(id, updateCourseDto);
+    return await this.coursesService.update(id, updateCourseDto, image);
   }
 
   @Delete(':id')

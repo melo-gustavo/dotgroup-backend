@@ -90,7 +90,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);
@@ -118,7 +118,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);
@@ -181,7 +181,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);
@@ -202,7 +202,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);
@@ -223,7 +223,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);
@@ -247,7 +247,7 @@ describe('EnrollmentsService', () => {
 
       classesService.findOne.mockResolvedValue({
         id: 1,
-        status: 'disponível',
+        status: 'ACTIVE',
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
       } as ClassEntity);

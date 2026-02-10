@@ -50,10 +50,10 @@ const validationEnrollment: (
     throw new BadRequestException('A turma não existe');
   }
 
-  // Validação 1: Verificar se turma está encerrada
-  if (classEntity.status === ClassStatus.ENCERRADA) {
+  // Validação 1: Verificar se turma está finalizada
+  if (classEntity.status === ClassStatus.FINISHED) {
     throw new BadRequestException(
-      'Não é possível matricular em uma turma encerrada',
+      'Não é possível matricular em uma turma finalizada',
     );
   }
 

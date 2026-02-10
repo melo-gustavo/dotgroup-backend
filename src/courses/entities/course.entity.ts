@@ -24,8 +24,8 @@ export class Course {
   @Column({ type: 'enum', enum: CourseType, nullable: false })
   type: CourseType;
 
-  @Column({ nullable: true })
-  image_url: string;
+  @Column({ type: 'text', nullable: true })
+  image_url: string | null;
 
   @Column({ nullable: true })
   createdAt: Date;

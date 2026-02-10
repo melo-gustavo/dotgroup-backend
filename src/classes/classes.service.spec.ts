@@ -182,6 +182,18 @@ describe('ClassesService', () => {
         }),
       ).rejects.toThrow(BadRequestException);
     });
+
+    it('should throw when endDate is before startDate on create', async () => {
+      await expect(
+        service.create({
+          teacherId: 1,
+          courseId: 1,
+          name: 'Turma A',
+          startDate: new Date('2024-06-02'),
+          endDate: new Date('2024-06-01'),
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('findAll', () => {
@@ -359,6 +371,19 @@ describe('ClassesService', () => {
           name: 'Turma A',
           startDate: new Date('2024-01-01'),
           endDate: 'invalid-date' as any,
+          id: 1,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw when endDate is before startDate on update', async () => {
+      await expect(
+        service.update(1, {
+          teacherId: 1,
+          courseId: 1,
+          name: 'Turma A',
+          startDate: new Date('2024-06-02'),
+          endDate: new Date('2024-06-01'),
           id: 1,
         }),
       ).rejects.toThrow(BadRequestException);

@@ -1,5 +1,6 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ClassStatus } from '../entities/class.entity';
 
 export class FilterClassDto {
   @IsOptional()
@@ -14,4 +15,8 @@ export class FilterClassDto {
 
   @IsOptional()
   name?: string;
+
+  @IsOptional()
+  @IsEnum(ClassStatus)
+  status?: ClassStatus;
 }

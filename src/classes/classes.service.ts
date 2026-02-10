@@ -3,10 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
-import { Class } from './entities/class.entity';
-import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { Class, ClassStatus } from './entities/class.entity';
+import { Repository, FindOptionsWhere, ILike, LessThan } from 'typeorm';
 import { FilterClassDto } from './dto/filter-class.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { parseDateField } from '../common/common';
@@ -62,6 +63,13 @@ const validationClass = async (
 
   const startDate = parseDateField(classDto.startDate, 'startDate');
   const endDate = parseDateField(classDto.endDate, 'endDate');
+
+  if (endDate < startDate) {
+    throw new BadRequestException(
+      'O campo "endDate" nao pode ser menor que "startDate"',
+    );
+  }
+
   const createdAt =
     classDto.createdAt !== undefined && classDto.createdAt !== null
       ? parseDateField(classDto.createdAt, 'createdAt')
@@ -106,7 +114,8 @@ export class ClassesService {
 
     if (query.teacherId) where.teacherId = query.teacherId;
     if (query.courseId) where.courseId = query.courseId;
-    if (query.name) where.name = Like(`%${query.name}%`);
+    if (query.name) where.name = ILike(`%${query.name.trim()}%`);
+    if (query.status) where.status = query.status;
 
     return await this.classesRepository.find({ where });
   }
@@ -145,5 +154,40 @@ export class ClassesService {
     await this.classesRepository.delete(id);
 
     return { deleted: true };
+  }
+
+  /**
+   * Finaliza turmas que passaram da data de término
+   * Executa automaticamente todos os dias à meia-noite
+   */
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async finalizeExpiredClasses(): Promise<void> {
+    const now = new Date();
+
+    // Encontra todas as turmas ativas cuja data final é menor que agora
+    const expiredClasses = await this.classesRepository.find({
+      where: {
+        status: ClassStatus.ACTIVE,
+        endDate: LessThan(now),
+      },
+    });
+
+    if (expiredClasses.length > 0) {
+      // Atualiza todas as turmas expiradas para o status FINISHED
+      await this.classesRepository.update(
+        {
+          status: ClassStatus.ACTIVE,
+          endDate: LessThan(now),
+        },
+        {
+          status: ClassStatus.FINISHED,
+          updatedAt: now,
+        },
+      );
+
+      console.log(
+        `[AUTO-FINALIZE] ${expiredClasses.length} turma(s) finalizada(s) automaticamente`,
+      );
+    }
   }
 }

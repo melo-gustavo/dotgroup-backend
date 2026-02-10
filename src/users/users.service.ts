@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Like, Repository, FindOptionsWhere } from 'typeorm';
+import { ILike, Repository, FindOptionsWhere } from 'typeorm';
 import { User, UserType } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { parseDateField } from '../common/common';
@@ -63,8 +63,8 @@ export class UsersService {
   async findAll(query: UserFilterDto) {
     const where: FindOptionsWhere<User> = {};
 
-    if (query.name) where.name = Like(`%${query.name}%`);
-    if (query.email) where.email = Like(`%${query.email}%`);
+    if (query.name) where.name = ILike(`%${query.name}%`);
+    if (query.email) where.email = ILike(`%${query.email}%`);
     if (query.type) where.type = query.type;
 
     return this.userRepository.find({ where });
