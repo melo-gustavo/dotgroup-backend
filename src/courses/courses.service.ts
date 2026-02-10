@@ -7,8 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, CourseType } from './entities/course.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { parseDateField } from '../common/common';
+import { CourseFilterDto } from './dto/filter-course.dto';
 
 const validationCourse: (course: CreateCourseDto | UpdateCourseDto) => {
   createdAt: any;
@@ -60,8 +61,13 @@ export class CoursesService {
     return await this.courseRepository.save(course);
   }
 
-  async findAll() {
-    return await this.courseRepository.find();
+  async findAll(query: CourseFilterDto) {
+    const where: FindOptionsWhere<Course> = {};
+
+    if (query.title) where.title = Like(`%${query.title}%`);
+    if (query.type) where.type = query.type;
+
+    return await this.courseRepository.find({ where });
   }
 
   async findOne(id: number) {
@@ -79,10 +85,6 @@ export class CoursesService {
 
     const course = await this.findOne(id);
 
-    if (!course) {
-      throw new NotFoundException(`Curso com ID ${id} não encontrado`);
-    }
-
     const updatedCourse = this.courseRepository.merge(course, {
       ...updateCourseDto,
       ...(createdAt ? { createdAt } : {}),
@@ -93,13 +95,10 @@ export class CoursesService {
   }
 
   async remove(id: number) {
-    const course = await this.findOne(id);
+    await this.findOne(id);
 
-    if (!course) {
-      throw new NotFoundException(`Curso com ID ${id} não encontrado`);
-    }
+    await this.courseRepository.delete(id);
 
-    await this.courseRepository.remove(course);
     return { deleted: true };
   }
 }

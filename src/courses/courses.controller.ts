@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { CourseFilterDto } from './dto/filter-course.dto';
 
 @Controller('courses')
 export class CoursesController {
@@ -22,8 +24,8 @@ export class CoursesController {
   }
 
   @Get()
-  async findAll() {
-    return await this.coursesService.findAll();
+  async findAll(@Query() query: CourseFilterDto) {
+    return await this.coursesService.findAll(query);
   }
 
   @Get(':id')

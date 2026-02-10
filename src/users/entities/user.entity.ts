@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Class } from '../../classes/entities/class.entity';
+import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 
 export enum UserType {
   STUDENT = 'STUDENT',
@@ -29,4 +31,10 @@ export class User {
 
   @Column({ nullable: true })
   updatedAt: Date;
+
+  @OneToMany(() => Class, (classEntity) => classEntity.teacher)
+  classesAsTeacher: Class[];
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
+  enrollments: Enrollment[];
 }

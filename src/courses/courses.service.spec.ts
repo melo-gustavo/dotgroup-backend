@@ -15,7 +15,7 @@ describe('CoursesService', () => {
     find: jest.fn(),
     findOneBy: jest.fn(),
     merge: jest.fn(),
-    remove: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -44,7 +44,7 @@ describe('CoursesService', () => {
     const dto = {
       title: 'TypeScript Basics',
       description: 'Learn TypeScript fundamentals',
-      type: CourseType.TECNOLOGY,
+      type: CourseType.TECHNOLOGY,
       createdAt,
       updatedAt,
     };
@@ -64,7 +64,7 @@ describe('CoursesService', () => {
         id: 1,
         title: 'Course 1',
         description: 'Description 1',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
       },
       {
         id: 2,
@@ -76,7 +76,7 @@ describe('CoursesService', () => {
 
     repository.find.mockResolvedValue(courses as Course[]);
 
-    await expect(service.findAll()).resolves.toEqual(courses);
+    await expect(service.findAll({})).resolves.toEqual(courses);
     expect(repository.find).toHaveBeenCalled();
   });
 
@@ -85,7 +85,7 @@ describe('CoursesService', () => {
       id: 1,
       title: 'TypeScript Basics',
       description: 'Learn TypeScript fundamentals',
-      type: CourseType.TECNOLOGY,
+      type: CourseType.TECHNOLOGY,
     };
 
     repository.findOneBy.mockResolvedValue(course as Course);
@@ -98,13 +98,14 @@ describe('CoursesService', () => {
     const dto = {
       title: 'Updated Course',
       description: 'Updated Description',
-      type: CourseType.INOVATION,
+      type: CourseType.INNOVATION,
+      id: 1,
     };
     const course = {
       id: 1,
       title: 'Old Title',
       description: 'Old Description',
-      type: CourseType.TECNOLOGY,
+      type: CourseType.TECHNOLOGY,
     };
     const updatedCourse = { ...course, ...dto };
 
@@ -123,15 +124,15 @@ describe('CoursesService', () => {
       id: 1,
       title: 'Course to Remove',
       description: 'Description',
-      type: CourseType.TECNOLOGY,
+      type: CourseType.TECHNOLOGY,
     };
 
     repository.findOneBy.mockResolvedValue(course as Course);
-    repository.remove.mockResolvedValue(course as Course);
+    repository.delete.mockResolvedValue({ affected: 1 } as any);
 
     await expect(service.remove(1)).resolves.toEqual({ deleted: true });
     expect(repository.findOneBy).toHaveBeenCalledWith({ id: 1 });
-    expect(repository.remove).toHaveBeenCalledWith(course);
+    expect(repository.delete).toHaveBeenCalledWith(1);
   });
 
   it('should throw when course is not found', async () => {
@@ -145,7 +146,7 @@ describe('CoursesService', () => {
       service.create({
         title: '',
         description: 'Some description',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -155,7 +156,7 @@ describe('CoursesService', () => {
       service.create({
         title: 'Some title',
         description: '',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -185,7 +186,8 @@ describe('CoursesService', () => {
       service.update(1, {
         title: '',
         description: 'Some description',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
+        id: 1,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -195,7 +197,8 @@ describe('CoursesService', () => {
       service.update(1, {
         title: 'Some title',
         description: '',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
+        id: 1,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -227,7 +230,8 @@ describe('CoursesService', () => {
       service.update(999, {
         title: 'Some title',
         description: 'Some description',
-        type: CourseType.TECNOLOGY,
+        type: CourseType.TECHNOLOGY,
+        id: 999,
       }),
     ).rejects.toThrow(NotFoundException);
   });

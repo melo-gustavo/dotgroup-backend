@@ -53,13 +53,17 @@ describe('ClassesService', () => {
     usersService = module.get(UsersService);
     coursesService = module.get(CoursesService);
     jest.clearAllMocks();
-    usersService.findOne.mockImplementation(async (id: number) => ({
-      id,
-      type: UserType.TEACHER,
-    }));
-    coursesService.findOne.mockImplementation(async (id: number) => ({
-      id,
-    }));
+    usersService.findOne.mockImplementation((id: number) =>
+      Promise.resolve({
+        id,
+        type: UserType.TEACHER,
+      }),
+    );
+    coursesService.findOne.mockImplementation((id: number) =>
+      Promise.resolve({
+        id,
+      }),
+    );
   });
 
   it('should be defined', () => {
@@ -203,7 +207,7 @@ describe('ClassesService', () => {
 
       repository.find.mockResolvedValue(classes as Class[]);
 
-      await expect(service.findAll()).resolves.toEqual(classes);
+      await expect(service.findAll({})).resolves.toEqual(classes);
       expect(repository.find).toHaveBeenCalled();
     });
   });
@@ -235,6 +239,7 @@ describe('ClassesService', () => {
   describe('update', () => {
     it('should update a class', async () => {
       const dto = {
+        id: 1,
         teacherId: 1,
         courseId: 1,
         name: 'Turma A Atualizada',
@@ -315,6 +320,7 @@ describe('ClassesService', () => {
           name: '',
           startDate: new Date('2024-01-01'),
           endDate: new Date('2024-06-01'),
+          id: 1,
         }),
       ).rejects.toThrow(BadRequestException);
     });
@@ -327,6 +333,7 @@ describe('ClassesService', () => {
           name: '   ',
           startDate: new Date('2024-01-01'),
           endDate: new Date('2024-06-01'),
+          id: 1,
         }),
       ).rejects.toThrow(BadRequestException);
     });
@@ -339,6 +346,7 @@ describe('ClassesService', () => {
           name: 'Turma A',
           startDate: 'invalid-date' as any,
           endDate: new Date('2024-06-01'),
+          id: 1,
         }),
       ).rejects.toThrow(BadRequestException);
     });
@@ -351,6 +359,7 @@ describe('ClassesService', () => {
           name: 'Turma A',
           startDate: new Date('2024-01-01'),
           endDate: 'invalid-date' as any,
+          id: 1,
         }),
       ).rejects.toThrow(BadRequestException);
     });
@@ -365,6 +374,7 @@ describe('ClassesService', () => {
           name: 'Turma A',
           startDate: new Date('2024-01-01'),
           endDate: new Date('2024-06-01'),
+          id: 999,
         }),
       ).rejects.toThrow(NotFoundException);
     });
